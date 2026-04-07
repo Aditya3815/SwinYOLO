@@ -53,7 +53,7 @@ head: [
     # but YOLO parser uses manual concat. To use BiFPNLayer we just pass the 4 scales to it)
     # The user brief says to use BiFPNLayer as a module. 
     # Let's collect the 4 multi-scale features: [21 (P2), 17 (P3), 13 (P4), 9 (P5)]
-    [[21, 17, 13, 9], 1, BiFPNLayer, [256, [128, 256, 512, 1024]]],       # 22 BiFPN fusion -> outputs list of 4 tensors
+    [[21, 17, 13, 9], 1, BiFPNLayer, [256, [128, 256, 512, 1024], True]],       # 22 BiFPN fusion (with DCNv2 at P3) -> list of 4
     
     [-1, 1, CoordAttMulti, [256, 256]],            # 23 Applies CA to all 4 tensors
     

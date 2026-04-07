@@ -20,6 +20,7 @@ SwinYOLO improves upon the baseline YOLOv5s architecture through five fundamenta
 3. **BiFPN Cross-Scale Fusion**: Fully replaces the PANet neck. Features are fused using EfficientDet's fast normalized weighted fusion (leveraging Depthwise Separable Convolutions)—allowing the network to learn the empirical importance of each varying scale directly.
 4. **Coordinate Attention (CA)**: Precise spatial positional data is injected adjacent to the detection heads bounding both the X and Y coordinate planes. 
 5. **4-Tier Detection Head**: Augments the standard 3-scale detection architecture by retaining an ultra-high resolution P2 tracking head exclusively for microscopic symbols.
+6. **Deformable Conv v2 (DCNv2)**: Integrated into the BiFPN neck (at the P3 scale) to improve spatial alignment and receptive field adaptability for irregular objects (like rotated vehicles or dense clusters).
 
 ---
 
@@ -51,7 +52,7 @@ graph TD
         
         H1 --> N1[BiFPN P5]
         H1 --> N2[BiFPN P4]
-        H1 --> N3[BiFPN P3]
+        H1 --> N3[BiFPN P3 + DCNv2]:::neck
         H1 --> N4[BiFPN P2]
     end
     

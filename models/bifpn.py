@@ -1,6 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+try:
+    from torchvision.ops import DeformConv2d
+except ImportError:
+    DeformConv2d = None
 
 class DepthwiseConvBlock(nn.Module):
     """Depthwise separable convolution for BiFPN."""
@@ -25,11 +29,39 @@ class DepthwiseConvBlock(nn.Module):
             x = self.act(x)
         return x
 
+class DeformConvBlock(nn.Module):
+    """Deformable Convolution v2 Block."""
+    def __init__(self, in_channels, out_channels, apply_bn=True, apply_act=True):
+        super(DeformConvBlock, self).__init__()
+        if DeformConv2d is None:
+            raise ImportError("torchvision.ops.DeformConv2d not found. Please install/update torchvision.")
+        
+        self.offset_conv = nn.Conv2d(in_channels, 18, kernel_size=3, padding=1, bias=True)
+        self.mask_conv = nn.Conv2d(in_channels, 9, kernel_size=3, padding=1, bias=True)
+        self.dcn = DeformConv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False)
+        
+        self.apply_bn = apply_bn
+        self.apply_act = apply_act
+        if self.apply_bn:
+            self.bn = nn.BatchNorm2d(out_channels)
+        if self.apply_act:
+            self.act = nn.SiLU()
+
+    def forward(self, x):
+        offset = self.offset_conv(x)
+        mask = torch.sigmoid(self.mask_conv(x))
+        x = self.dcn(x, offset, mask)
+        if self.apply_bn:
+            x = self.bn(x)
+        if self.apply_act:
+            x = self.act(x)
+        return x
+
 class BiFPNLayer(nn.Module):
     """
     BiFPN Layer supporting 4 levels (P2, P3, P4, P5) with fast normalized fusion.
     """
-    def __init__(self, num_channels, in_channels_list=None, num_levels=4, epsilon=1e-4):
+    def __init__(self, num_channels, in_channels_list=None, use_dcn=False, num_levels=4, epsilon=1e-4):
         super(BiFPNLayer, self).__init__()
         self.epsilon = epsilon
         
@@ -60,7 +92,11 @@ class BiFPNLayer(nn.Module):
         self.conv_p3_td = DepthwiseConvBlock(num_channels, num_channels)
         self.conv_p2_out = DepthwiseConvBlock(num_channels, num_channels)
         
-        self.conv_p3_out = DepthwiseConvBlock(num_channels, num_channels)
+        if use_dcn:
+            self.conv_p3_out = DeformConvBlock(num_channels, num_channels)
+        else:
+            self.conv_p3_out = DepthwiseConvBlock(num_channels, num_channels)
+            
         self.conv_p4_out = DepthwiseConvBlock(num_channels, num_channels)
         self.conv_p5_out = DepthwiseConvBlock(num_channels, num_channels)
 
@@ -131,8 +167,18 @@ if __name__ == '__main__':
         torch.randn(1, 256, 40, 40),    # P4
         torch.randn(1, 256, 20, 20),    # P5
     ]
-    m = BiFPNLayer(num_channels=256, num_levels=4)
+    # Test standard
+    m = BiFPNLayer(num_channels=256, in_channels_list=[256, 256, 256, 256])
     outs = m(feats)
+    print("Standard BiFPNLayer test passed!")
+    
+    # Test DCN
+    try:
+        m_dcn = BiFPNLayer(num_channels=256, in_channels_list=[256, 256, 256, 256], use_dcn=True)
+        outs_dcn = m_dcn(feats)
+        print("DCN BiFPNLayer test passed!")
+    except Exception as e:
+        print(f"DCN test failed: {e}")
     print("BiFPNLayer test results:")
     for i, o in enumerate(outs):
         print(f"P{i+2}_out: {o.shape} (expected: {feats[i].shape})")
