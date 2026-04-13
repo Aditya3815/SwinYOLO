@@ -1,10 +1,21 @@
-path: ./datasets/pid        # dataset root dir (can be absolute or relative)
-train: images/train       # train images (relative to 'path')
-val: images/val           # val images (relative to 'path')
-test: images/test         # test images (optional)
+path: ./datasets/pid # dataset root dir (can be absolute or relative)
+train: images/train # train images (relative to 'path')
+val: images/val # val images (relative to 'path')
+test: images/test # test images (optional)
 
 # Classes
-nc: 12  # number of classes
-names: ['symbol_0', 'symbol_1', 'symbol_2', 'symbol_3', 'symbol_4', 
-        'symbol_5', 'symbol_6', 'symbol_7', 'symbol_8', 'symbol_9', 
-        'symbol_10', 'symbol_11']  # Replace with actual class labels
+nc: 12 # number of classes
+names: [
+    "symbol_0",
+    "symbol_1",
+    "symbol_2",
+    "symbol_3",
+    "symbol_4",
+    "symbol_5",
+    "symbol_6",
+    "symbol_7",
+    "symbol_8",
+    "symbol_9",
+    "symbol_10",
+    "symbol_11",
+  ] # Replace with actual class labels
