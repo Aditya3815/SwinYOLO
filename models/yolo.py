@@ -25,6 +25,7 @@ if str(ROOT) not in sys.path:
 if platform.system() != "Windows":
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
+from models.bifpn import BiFPNLayer
 from models.common import (
     C3,
     C3SPP,
@@ -49,7 +50,9 @@ from models.common import (
     GhostConv,
     Proto,
 )
+from models.coord_attention import CoordAtt, CoordAttMulti
 from models.experimental import MixConv2d
+from models.swin_block import C3SWT
 from utils.autoanchor import check_anchor_order
 from utils.general import LOGGER, check_version, check_yaml, colorstr, make_divisible, print_args
 from utils.plots import feature_visualization
@@ -63,12 +66,9 @@ from utils.torch_utils import (
     time_sync,
 )
 
-from models.swin_block import C3SWT
-from models.coord_attention import CoordAtt, CoordAttMulti
-from models.bifpn import BiFPNLayer
-
 try:
     import thop  # for FLOPs computation
+
     thop = None  # Disable THOP temporarily as it crashes on multi-scale list outputs
 except ImportError:
     thop = None
@@ -426,10 +426,13 @@ def parse_model(d, ch):
             nn.ConvTranspose2d,
             DWConvTranspose2d,
             C3x,
-            C3SWT, CoordAttMulti, CoordAtt
+            C3SWT,
+            CoordAttMulti,
+            CoordAtt,
         }:
             c1, c2 = ch[f], args[0]
-            if isinstance(c1, list): c1 = c1[0]  # Take first channel if input is a list
+            if isinstance(c1, list):
+                c1 = c1[0]  # Take first channel if input is a list
             if c2 != no:  # if not output
                 c2 = make_divisible(c2 * gw, ch_mul)
 
