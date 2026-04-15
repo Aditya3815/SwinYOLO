@@ -17,7 +17,7 @@ SwinYOLO improves upon the baseline YOLOv5s architecture through five fundamenta
 
 1. **CIOU K-Means Anchoring**: Upgraded initial bounding box clustering logic utilizing Complete-IOU (CIOU) instead of standard Euclidean mathematics. This factors aspect-ratio scaling to perfectly map dataset-specific anchors.
 2. **C3SW-T (Swin Transformer Blocks)**: Replaces traditional Bottleneck convolution logic deep in the network with modified Swin Transformer operations. *Note: We intentionally excluded LayerNorms here to prevent CNN feature degradation!*
-3. **BiFPN Cross-Scale Fusion**: Fully replaces the PANet neck. Features are fused using EfficientDet's fast normalized weighted fusion (leveraging Depthwise Separable Convolutions)—allowing the network to learn the empirical importance of each varying scale directly.
+3. **BiFPN Cross-Scale Fusion (Hybrid PANet+BiFPN Neck)**: A top-down PANet pathway (Conv+Upsample+C3SWT×3 levels) first generates multi-scale features, which are then fused using EfficientDet's fast normalized weighted BiFPN with Depthwise Separable Convolutions—allowing the network to learn the empirical importance of each scale. DCNv2 deformable convolutions are applied at P3 inside BiFPN for improved spatial alignment on dense small objects.
 4. **Coordinate Attention (CA)**: Precise spatial positional data is injected adjacent to the detection heads bounding both the X and Y coordinate planes. 
 5. **4-Tier Detection Head**: Augments the standard 3-scale detection architecture by retaining an ultra-high resolution P2 tracking head exclusively for microscopic symbols.
 6. **Deformable Conv v2 (DCNv2)**: Integrated into the BiFPN neck (at the P3 scale) to improve spatial alignment and receptive field adaptability for irregular objects (like rotated vehicles or dense clusters).
@@ -80,12 +80,15 @@ python utils/ciou_kmeans.py --label-dir path/to/your/labels/train --img-size 640
 Start training directly invoking the newly constructed Swin-Transformer configuration file!
 ```bash
 python train.py \
-  --img 640 \
-  --batch 32 \
-  --epochs 300 \
-  --data data/pid.yaml \
+  --img 1024 \
+  --batch 4 \
+  --epochs 250 \
+  --data data/sld.yaml \
   --cfg models/yolov5s_swint.yaml \
-  --weights yolov5s.pt
+  --hyp data/hyps/hyp.swinyolo-adamw.yaml \
+  --optimizer AdamW \
+  --cos-lr \
+  --weights ""
 ```
 *Weights with matching sizes (like early CNN layers) will be seamlessly migrated from standard YOLOv5s.*
 
