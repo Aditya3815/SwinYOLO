@@ -34,7 +34,7 @@ graph TD
     classDef neck fill:#fff3cd,stroke:#ffc107,stroke-width:2px,color:#000;
     classDef head fill:#f8d7da,stroke:#dc3545,stroke-width:2px,color:#000;
     
-    A[Input Image<br/>640x640]:::input --> B(Conv Layers P1/P2):::backbone
+    A[Input Image<br/>1024x1024]:::input --> B(Conv Layers P1/P2):::backbone
     B --> C(C3 Modules)
     
     subgraph CSP-Swin Backbone
