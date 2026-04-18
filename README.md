@@ -7,7 +7,7 @@
 
 ## 📌 Overview
 
-This repository provides a custom PyTorch implementation of the architecture detailed in the research paper: **"Swin-Transformer-Based YOLOv5 for Small-Object Detection in Remote Sensing Images"** *(Sensors 2023, 23, 3634)*. 
+This repository takes inspiration from the research paper **"Swin-Transformer-Based YOLOv5 for Small-Object Detection in Remote Sensing Images"** *(Sensors 2023, 23, 3634)* and implements a modified architecture that differs from the original design.
 
 While vanilla YOLOv5 excels at generalized object detection, its performance falters on exceptionally dense clusters and small symbols commonly found in aerial photography, drones, and high-resolution maps. SwinYOLO upgrades the traditional CSPDarknet footprint natively, adding a marginal ~0.4M parameters in exchange for robust spatial awareness and tiny-object acuity. 
 
