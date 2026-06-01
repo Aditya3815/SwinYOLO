@@ -1040,34 +1040,6 @@ venv/bin/python3 train_da_yolo.py \
     --mode scratch
 ```
 
----
-
-## Roadmap
-
-- [x] DC3SWT: MSDA replacing fixed-window Swin (backbone P5 + all PANet levels)
-- [x] SE-BiFPN: SEBlock at all 6 BiFPN fusion nodes
-- [x] WIoU v1: geometric box regression loss
-- [x] CoordAttMulti: per-scale coordinate attention at detection head
-- [x] 4-scale head: P2/P3/P4/P5 (stride 4/8/16/32)
-- [x] CIOU k-means anchor clustering (`utils/ciou_kmeans.py`)
-- [x] VisDrone2019-DET training + evaluation (mAP@0.5: 30.85% with SAHI)
-- [x] SAHI evaluation script with cross-patch NMS (`evaluate_visdrone_sahi.py`)
-- [x] DIOR-R dataset support (`utils/dior_converter.py`, `data/dior.yaml`, `models/da_yolo_dior.yaml`)
-- [x] DOTA 1.5 OBB→HBB converter (`utils/dota_hbb_converter.py`, `data/dota.yaml`, `models/da_yolo_dota.yaml`)
-- [x] Dataset-specific hyp yamls for VisDrone, DIOR-R, DOTA 1.5
-- [x] DIOR-R benchmark results — **60.00% mAP@0.5** (`runs/da_yolo/dior_scratch3`, epoch 144)
-<<<<<<< HEAD
-- [ ] DOTA 1.5 benchmark results (training in progress — `runs/da_yolo/dota_scratch`)
-=======
-- [x] DOTA 1.5 benchmark results — **33.33% mAP@0.5** (`runs/da_yolo/dota_scratch2`, epoch 95)
-- [x] Inference pipelines: `infer_dior.py` and `infer_dota.py` with JSON/CSV/mosaic output
->>>>>>> 9eb81d71 (feat: DA-YOLO v2 -- full release with DIOR-R, DOTA 1.5, and VisDrone benchmarks)
-- [ ] DIOR-R OBB head extension (angle regression branch)
-- [ ] fp16 / TensorRT export validation on VisDrone
-- [ ] SAHI evaluation script for DIOR-R and DOTA
-
----
-
 ## Design Decisions
 
 ### Why DCNv2 at P3 only — not all BiFPN nodes?
