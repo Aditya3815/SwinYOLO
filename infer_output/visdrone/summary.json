@@ -1,0 +1,69 @@
+{
+  "run_info": {
+    "weights": "/home/ubuntu/project_DA-YOLO/DA-YOLO/runs/da_yolo/visdrone_scratch2/weights/best.pth",
+    "source": "/home/ubuntu/project_DA-YOLO/DA-YOLO/VisDrone_dataset/yolo/images/val",
+    "num_images": 5,
+    "total_dets": 240,
+    "patch_size": 1280,
+    "overlap": 0.25,
+    "conf_thres": 0.25,
+    "nms_iou": 0.45,
+    "device": "cuda:0",
+    "total_time_s": 0.91,
+    "avg_ms_per_img": 182.0,
+    "fps": 5.5
+  },
+  "class_counts": {
+    "car": 118,
+    "pedestrian": 53,
+    "motor": 51,
+    "people": 18
+  },
+  "per_image_counts": {
+    "0000001_02999_d_0000005.jpg": {
+      "total": 38,
+      "by_class": {
+        "car": 11,
+        "pedestrian": 3,
+        "motor": 16,
+        "people": 8
+      }
+    },
+    "0000001_03499_d_0000006.jpg": {
+      "total": 36,
+      "by_class": {
+        "car": 17,
+        "pedestrian": 9,
+        "people": 4,
+        "motor": 6
+      }
+    },
+    "0000001_03999_d_0000007.jpg": {
+      "total": 28,
+      "by_class": {
+        "car": 3,
+        "pedestrian": 12,
+        "people": 4,
+        "motor": 9
+      }
+    },
+    "0000001_04527_d_0000008.jpg": {
+      "total": 52,
+      "by_class": {
+        "pedestrian": 24,
+        "car": 9,
+        "motor": 18,
+        "people": 1
+      }
+    },
+    "0000001_05249_d_0000009.jpg": {
+      "total": 86,
+      "by_class": {
+        "car": 78,
+        "pedestrian": 5,
+        "motor": 2,
+        "people": 1
+      }
+    }
+  }
+}

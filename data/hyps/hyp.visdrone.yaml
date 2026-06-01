@@ -1,0 +1,66 @@
+# Hyperparameters for DA-YOLO on VisDrone2019-DET — Retrain v2
+# Optimised for drone-captured aerial imagery with dense tiny objects.
+# Recommended: AdamW optimizer, cosine LR, input size 1280px.
+#
+# Changes from v1 (the 150-epoch run):
+#   copy_paste: 0.3 → 0.5  : More aggressive pasting of rare objects (bicycle, tricycle)
+#                             train.py uses model.class_weights (auto-computed from label
+#                             frequencies) for classification loss, but copy_paste further
+#                             augments rare-class appearance in training images.
+#   lrf:        0.01 → 0.005 : Cosine anneals deeper — helps squeeze a few more points
+#                              when training runs 200 epochs.
+#   anchor_t:   4.0 → 3.5   : Looser anchor matching threshold assigns more positive targets
+#                              to rare-class GT boxes that have fewer nearby anchors.
+#   iou_t:      0.20 → 0.18  : Same motivation — accept slightly lower-IoU matches for
+#                              tiny objects like bicycle/awning-tricycle (2–8px).
+#
+# VisDrone-specific issues addressed:
+#   - Extreme class imbalance (car >> pedestrian >> bus >> bicycle)
+#     → fl_gamma=1.5 focal loss + auto class_weights in train.py
+#   - Many tiny occluded objects (2–16px)
+#     → obj=1.5 up-weights objectness branch
+#   - Dense background clutter
+#     → label_smoothing=0.0 keeps positives sharp
+#   - Rare classes (bicycle 3.6%, awning-tricycle 3.1%)
+#     → copy_paste=0.5 synthesises more rare-object appearances per epoch
+
+lr0: 0.0001            # Initial LR — from-scratch training
+lrf: 0.005             # Final LR ratio — cosine anneals deeper (lr0 * lrf = 5e-7)
+momentum: 0.937        # AdamW beta1
+weight_decay: 0.05     # AdamW standard
+warmup_epochs: 3.0
+warmup_momentum: 0.8
+warmup_bias_lr: 0.0001
+
+# Loss component gains
+box: 0.05
+cls: 0.5
+cls_pw: 1.0
+obj: 1.5               # Up-weighted: VisDrone has many tiny objects at P2 head
+obj_pw: 1.0
+
+# Loss type
+loss_type: wiou        # WIoU v1 geometric loss (AAAI 2023)
+
+# Anchor matching — slightly looser to capture more positives for tiny/rare objects
+iou_t: 0.18
+anchor_t: 3.5
+fl_gamma: 1.5          # Focal loss — severe class imbalance
+
+# Label smoothing
+label_smoothing: 0.0   # Keep positives sharp for densely occluded objects
+
+# Augmentation
+hsv_h: 0.015
+hsv_s: 0.7             # Drone lighting varies dramatically
+hsv_v: 0.4
+degrees: 0.0           # Fixed aerial orientation — no rotation
+translate: 0.1
+scale: 0.5             # ±50% scale jitter — objects span 4px to 300px
+shear: 0.0
+perspective: 0.0
+flipud: 0.0            # Fixed aerial orientation
+fliplr: 0.5
+mosaic: 1.0            # Essential for small-object diversity
+mixup: 0.0             # Disabled — blurs tiny object boundaries
+copy_paste: 0.5        # Increased from 0.3 — more rare-class pasting per image

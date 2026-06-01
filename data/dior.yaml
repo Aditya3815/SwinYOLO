@@ -1,0 +1,90 @@
+# DIOR-R Dataset Configuration for DA-YOLO (HBB mode)
+#
+# Dataset: DIOR-R (Object Detection in Optical Remote Sensing Images — Rotated)
+# Source:  https://gcheng-nwpu.github.io/#Datasets
+# Classes: 20
+# Images:  11,725 train / 3,906 val / 7,832 test  (all at 800×800 px)
+# Instances: ~190,288 total
+#
+# Note: DA-YOLO currently uses HBB (axis-aligned bounding boxes).
+#       OBB (oriented boxes) require an angle regression head — future work.
+#       The converter uses <bndbox> elements from the VOC XML annotations.
+#
+# ── Download ──────────────────────────────────────────────────────────────
+#
+#   1. Go to: https://gcheng-nwpu.github.io/#Datasets
+#      Click "DIOR" or "DIOR-R" → follow the Google Drive download link.
+#      Download and extract the zip to /data/DIOR-R/
+#
+#   Alternative (if a direct gdown link is available):
+#      pip install gdown
+#      gdown --fuzzy "<Google Drive folder link>" -O /data/DIOR-R.zip
+#      unzip /data/DIOR-R.zip -d /data/
+#
+#   Expected structure after extraction:
+#      /data/DIOR-R/
+#        JPEGImages/        *.jpg  (~23K images, train+val+test combined)
+#        Annotations/       *.xml  (VOC XML with <bndbox> + <robndbox>)
+#        ImageSets/Main/
+#          train.txt        11725 image stems
+#          val.txt          3906 image stems
+#          test.txt         7832 image stems
+#
+# ── Conversion ────────────────────────────────────────────────────────────
+#
+#   python utils/dior_converter.py \
+#       --root /data/DIOR-R \
+#       --out  /data/DIOR-R/yolo
+#
+# ── Anchor re-clustering (recommended) ────────────────────────────────────
+#
+#   python utils/ciou_kmeans.py \
+#       --label-dir /data/DIOR-R/yolo/labels/train \
+#       --img-size 800 \
+#       --n-clusters 12
+#   Paste output into models/da_yolo.yaml anchors section.
+#
+# ── Training ──────────────────────────────────────────────────────────────
+#
+#   python train_da_yolo.py \
+#       --data data/dior.yaml \
+#       --mode scratch \
+#       --img-size 800 \
+#       --batch-size 8
+#
+# ── Notes ─────────────────────────────────────────────────────────────────
+#   - All DIOR images are 800×800 — no tiling needed (unlike DOTA)
+#   - Objects are larger relative to image size compared to VisDrone
+#   - Recommended image size: 800px (matches originals, no interpolation)
+#   - batch-size 8 is safe at 800px for 8GB GPU (vs 4 at 1280px for VisDrone)
+
+# Dataset root — set to --out path from dior_converter.py
+path: /data/DIOR-R/yolo
+
+train: images/train
+val:   images/val
+test:  images/test
+
+nc: 20
+
+names:
+  0:  airplane
+  1:  airport
+  2:  baseballfield
+  3:  basketballcourt
+  4:  bridge
+  5:  chimney
+  6:  dam
+  7:  expressway-service-area
+  8:  expressway-toll-station
+  9:  golffield
+  10: groundtrackfield
+  11: harbor
+  12: overpass
+  13: ship
+  14: stadium
+  15: storagetank
+  16: tenniscourt
+  17: trainstation
+  18: vehicle
+  19: windmill

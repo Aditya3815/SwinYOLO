@@ -1,9 +1,9 @@
 cff-version: 1.2.0
 message: >-
-  If you use DASwin-YOLO in your research, please cite the software
+  If you use DA-YOLO in your research, please cite the software
   as below. Also cite the foundational works listed under references.
 
-title: "DASwin-YOLO: Deformable Attention Swin Transformer YOLOv5 for Small-Object Detection"
+title: "DA-YOLO: Deformable Attention YOLO for Small-Object Detection in Remote Sensing and Drone Imagery"
 type: software
 
 authors:
@@ -11,19 +11,23 @@ authors:
     given-names: Aditya
     github: https://github.com/Aditya3815
 
-repository-code: https://github.com/Aditya3815/SwinYOLO
+repository-code: https://github.com/Aditya3815/DASwin-YOLO
 license: AGPL-3.0
-version: "1.0.0"
-date-released: "2024-04-21"
+version: "2.0.0"
+date-released: "2025-06-01"
 
 abstract: >-
-  DASwin-YOLO is a novel object detection architecture that replaces the
-  fixed-window multi-head self-attention (W-MSA + SW-MSA) of the Swin
-  Transformer backbone with Multi-Scale Deformable Attention (MSDA), implemented
-  as the DC3SWT block. The architecture combines a CSP-DC3SWT backbone, a
-  4-level BiFPN neck with DCNv2 at P3, CoordAttMulti, and a 4-scale detection
-  head (P2-P5). Designed for dense small-object detection in high-resolution
-  remote sensing imagery. Fully generalised for any object detection dataset.
+  DA-YOLO (Deformable Attention YOLO) is a novel object detection architecture
+  extending YOLOv5s with five principled improvements for dense small-object
+  detection: (1) DC3SWT — Multi-Scale Deformable Attention replacing fixed-window
+  Swin attention (W-MSA+SW-MSA) in both backbone P5 and all PANet neck levels;
+  (2) WIoU v1 geometric box regression loss; (3) SE-BiFPN — BiFPN cross-scale
+  neck with Squeeze-Excitation channel recalibration at all 6 fusion nodes;
+  (4) CoordAttMulti — per-scale Coordinate Attention injected before each
+  detection head; (5) 4-scale detection head (P2–P5, strides 4/8/16/32).
+  Benchmarked on VisDrone2019-DET (30.85% mAP@0.5 with SAHI), DIOR-R
+  (60.00% mAP@0.5), and DOTA 1.5 (33.33% mAP@0.5). All components implemented
+  in pure PyTorch — no custom CUDA extensions required.
 
 keywords:
   - object-detection
@@ -54,8 +58,8 @@ references:
     doi: 10.3390/s23073634
     url: https://doi.org/10.3390/s23073634
     notes: >-
-      This work is the direct inspiration for the SwinYOLO baseline
-      (C3SWT blocks) that DASwin-YOLO extends and improves upon.
+      This work is the direct inspiration for the C3SWT baseline
+      (fixed-window Swin blocks) that DA-YOLO extends and improves upon.
 
   - type: conference-paper
     title: "Deformable DETR: Deformable Transformers for End-to-End Object Detection"
@@ -77,8 +81,20 @@ references:
     url: https://arxiv.org/abs/2010.04159
     notes: >-
       The Multi-Scale Deformable Attention (MSDA) mechanism that DC3SWT
-      is derived from. DASwin-YOLO adapts MSDA for single-scale feature
+      is derived from. DA-YOLO adapts MSDA for single-scale feature
       maps within a YOLOv5-style backbone, implemented in pure PyTorch.
+
+  - type: article
+    title: "Wise-IoU: Bounding Box Regression Loss with Dynamic Focusing Mechanism"
+    authors:
+      - family-names: Tong
+        given-names: Zanjia
+    journal: "AAAI 2023"
+    year: 2023
+    url: https://arxiv.org/abs/2301.10051
+    notes: >-
+      WIoU v1 geometric focusing loss used in DA-YOLO for down-weighting
+      easy anchors and concentrating gradient on geometrically hard predictions.
 
   - type: software
     title: "YOLOv5 by Ultralytics"
@@ -92,6 +108,6 @@ references:
     license: AGPL-3.0
     url: https://github.com/ultralytics/yolov5
     notes: >-
-      DASwin-YOLO is built on top of the YOLOv5 training framework.
+      DA-YOLO is built on top of the YOLOv5 training framework.
       The backbone, data pipeline, loss functions, and training loop
       are derived from this codebase.

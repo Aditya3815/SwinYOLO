@@ -448,19 +448,21 @@ def parse_model(d, ch):
             c2 = args[0]
             c2 = make_divisible(c2 * gw, ch_mul)
             in_channels = [ch[x] for x in f]  # auto-resolved from actual feature map channels
-            # Flexible YAML arg parsing:
-            #   New format (preferred): [num_channels, use_dcn]      → args has 2 elements
-            #   Old format (compat):    [num_channels, list, use_dcn] → args has 3 elements
-            # The intermediate channel list (old format args[1]) was always a placeholder —
-            # in_channels is always derived from the actual upstream feature map channels.
+            # YAML arg format for BiFPNLayer:
+            #   3-arg (preferred): [num_channels, use_dcn, use_se]  ← DA-YOLO standard
+            #   2-arg (compat):    [num_channels, use_dcn]           ← se defaults False
+            #   1-arg (minimal):   [num_channels]                    ← both default False
             if len(args) >= 3:
-                use_dcn = bool(args[2])   # old 3-arg format
+                use_dcn = bool(args[1])
+                use_se  = bool(args[2])
             elif len(args) == 2:
-                use_dcn = bool(args[1])   # new 2-arg format: [num_channels, use_dcn]
+                use_dcn = bool(args[1])
+                use_se  = False
             else:
                 use_dcn = False
+                use_se  = False
             num_levels = len(f)
-            args = [c2, in_channels, use_dcn, num_levels]
+            args = [c2, in_channels, use_dcn, use_se, num_levels]
             c2 = [c2] * len(f)
         # TODO: channel, gw, gd
         elif m in {Detect, Segment}:

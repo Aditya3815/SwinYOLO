@@ -115,6 +115,9 @@ class ComputeLoss:
         """Initializes ComputeLoss with model and autobalance option, autobalances losses if True."""
         device = next(model.parameters()).device  # get model device
         h = model.hyp  # hyperparameters
+        # loss_type controls box regression: 'wiou' uses WIoU v1 geometric loss (AAAI 2023);
+        # any other value falls back to CIoU.
+        self.use_wiou = h.get("loss_type", "ciou").lower() == "wiou"
 
         # Define criteria
         BCEcls = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([h["cls_pw"]], device=device))
@@ -158,8 +161,8 @@ class ComputeLoss:
                 pxy = pxy.sigmoid() * 2 - 0.5
                 pwh = (pwh.sigmoid() * 2) ** 2 * anchors[i]
                 pbox = torch.cat((pxy, pwh), 1)  # predicted box
-                iou = bbox_iou(pbox, tbox[i], CIoU=True).squeeze()  # iou(prediction, target)
-                lbox += (1.0 - iou).mean()  # iou loss
+                iou = bbox_iou(pbox, tbox[i], CIoU=not self.use_wiou, WIoU=self.use_wiou).squeeze()
+                lbox += (1.0 - iou).mean()  # iou loss (works for both CIoU and WIoU)
 
                 # Objectness
                 iou = iou.detach().clamp(0).type(tobj.dtype)

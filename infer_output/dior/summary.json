@@ -1,0 +1,152 @@
+{
+  "run_info": {
+    "weights": "/home/ubuntu/project_DA-YOLO/DA-YOLO/runs/da_yolo/dior_scratch3/weights/best.pth",
+    "source": "/data/DIOR-R/yolo/images/val",
+    "num_images": 20,
+    "total_detections": 114,
+    "imgsz": 800,
+    "conf_thres": 0.25,
+    "nms_iou": 0.45,
+    "device": "cuda:0",
+    "total_time_s": 1.33,
+    "avg_ms_per_img": 66.6,
+    "fps": 15.0
+  },
+  "class_counts": {
+    "vehicle": 37,
+    "ship": 27,
+    "trainstation": 15,
+    "tenniscourt": 11,
+    "basketballcourt": 7,
+    "windmill": 6,
+    "bridge": 2,
+    "overpass": 2,
+    "baseballfield": 2,
+    "airport": 2,
+    "stadium": 1,
+    "expressway-toll-station": 1,
+    "harbor": 1
+  },
+  "per_image": {
+    "05863.jpg": {
+      "total": 2,
+      "by_class": {
+        "windmill": 2
+      }
+    },
+    "05864.jpg": {
+      "total": 2,
+      "by_class": {
+        "bridge": 2
+      }
+    },
+    "05865.jpg": {
+      "total": 8,
+      "by_class": {
+        "vehicle": 4,
+        "basketballcourt": 3,
+        "tenniscourt": 1
+      }
+    },
+    "05866.jpg": {
+      "total": 1,
+      "by_class": {
+        "overpass": 1
+      }
+    },
+    "05867.jpg": {
+      "total": 2,
+      "by_class": {
+        "overpass": 1,
+        "vehicle": 1
+      }
+    },
+    "05868.jpg": {
+      "total": 2,
+      "by_class": {
+        "windmill": 2
+      }
+    },
+    "05869.jpg": {
+      "total": 11,
+      "by_class": {
+        "tenniscourt": 8,
+        "stadium": 1,
+        "baseballfield": 1,
+        "vehicle": 1
+      }
+    },
+    "05870.jpg": {
+      "total": 8,
+      "by_class": {
+        "basketballcourt": 4,
+        "vehicle": 4
+      }
+    },
+    "05871.jpg": {
+      "total": 18,
+      "by_class": {
+        "trainstation": 7,
+        "vehicle": 11
+      }
+    },
+    "05872.jpg": {
+      "total": 4,
+      "by_class": {
+        "expressway-toll-station": 1,
+        "vehicle": 3
+      }
+    },
+    "05873.jpg": {
+      "total": 2,
+      "by_class": {
+        "tenniscourt": 2
+      }
+    },
+    "05874.jpg": {
+      "total": 8,
+      "by_class": {
+        "trainstation": 7,
+        "vehicle": 1
+      }
+    },
+    "05875.jpg": {
+      "total": 12,
+      "by_class": {
+        "vehicle": 12
+      }
+    },
+    "05877.jpg": {
+      "total": 2,
+      "by_class": {
+        "baseballfield": 1,
+        "trainstation": 1
+      }
+    },
+    "05879.jpg": {
+      "total": 1,
+      "by_class": {
+        "airport": 1
+      }
+    },
+    "05880.jpg": {
+      "total": 28,
+      "by_class": {
+        "ship": 27,
+        "harbor": 1
+      }
+    },
+    "05881.jpg": {
+      "total": 1,
+      "by_class": {
+        "airport": 1
+      }
+    },
+    "05882.jpg": {
+      "total": 2,
+      "by_class": {
+        "windmill": 2
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+Class                              AP@0.5 (%)   AP@.5:.95 (%)
+--------------------------------------------------------------
+airplane                                91.17           65.16
+airport                                 28.72           10.10
+baseballfield                           91.92           76.14
+basketballcourt                         75.62           55.54
+bridge                                  29.52           12.62
+chimney                                 86.75           63.11
+dam                                     25.11            8.44
+expressway-service-area                 51.99           24.04
+expressway-toll-station                 55.59           36.62
+golffield                               39.76           13.12
+groundtrackfield                        51.39           34.66
+harbor                                  36.35           16.23
+overpass                                39.94           19.12
+ship                                    90.18           50.08
+stadium                                 80.54           44.41
+storagetank                             78.74           59.72
+tenniscourt                             88.85           75.77
+trainstation                            17.18            5.22
+vehicle                                 68.26           39.84
+windmill                                72.42           30.15
+--------------------------------------------------------------
+mAP                                     60.00           37.00

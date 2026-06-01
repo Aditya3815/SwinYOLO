@@ -1,0 +1,58 @@
+# Hyperparameters for DA-YOLO fine-tuning with AdamW optimizer
+# Architecture: DC3SWT backbone + BiFPN (SE) neck + CoordAttention, 4-scale heads (P2–P5)
+# Loss: WIoU geometric regression loss (down-weights easy anchors, focuses on hard negatives)
+# Target: High-resolution dense small-object detection (VisDrone, DOTA, DIOR-R)
+#
+# Recommended optimizer: AdamW  (pass --optimizer AdamW)
+# Recommended schedule:  Cosine LR  (pass --cos-lr)
+#
+# Key design choices vs. default YOLOv5 hyps:
+#   lr0 = 1e-6      : Prevents numerical instability in Transformer blocks at early epochs
+#   weight_decay    : 0.05 — AdamW standard (Liu et al. 2021)
+#   label_smoothing : 0.1  — beneficial for dense datasets with noisy/occluded labels
+#   copy_paste      : 0.1  — increases object density diversity
+#   loss_type: wiou : WIoU v1 geometric loss replaces CIoU (AAAI 2023)
+#                     Geometric factor g = exp(ρ²/c²) down-weights easy centred anchors
+#                     and amplifies gradient for medium-difficulty small objects.
+
+lr0: 0.000001          # Initial LR — 1e-6 prevents Transformer block gradient spike at epoch ~10
+lrf: 1.0               # Final LR ratio — flat plateau (lr_min = lr0 × lrf)
+momentum: 0.937        # AdamW beta1
+weight_decay: 0.05     # AdamW standard weight decay (decoupled)
+warmup_epochs: 3.0     # Short warmup — at lr=1e-6 warmup is less critical
+warmup_momentum: 0.8   # Warmup beta1
+warmup_bias_lr: 0.000001  # Must equal lr0 for AdamW fine-tuning
+
+# Loss component gains (auto-scaled by train.py for nl=4 heads)
+box: 0.05              # Box regression loss gain (WIoU applied here)
+cls: 0.5               # Classification loss gain
+cls_pw: 1.0            # BCE positive weight for cls loss
+obj: 1.0               # Objectness loss gain
+obj_pw: 1.0            # BCE positive weight for obj loss
+
+# Loss type — controls box regression loss in ComputeLoss
+# Options: 'ciou' (default YOLOv5), 'wiou' (WIoU v1 geometric, AAAI 2023)
+loss_type: wiou
+
+# Anchor matching
+iou_t: 0.20            # IoU training threshold
+anchor_t: 4.0          # Anchor-multiple threshold
+fl_gamma: 0.0          # Focal loss gamma (0 = disabled; set 1.5 for severe class imbalance)
+
+# Label smoothing
+label_smoothing: 0.1   # Smoothing epsilon; 0.0 to disable
+
+# Augmentation — conservative defaults for high-resolution dense aerial imagery
+hsv_h: 0.015           # Image HSV-Hue augmentation (fraction)
+hsv_s: 0.3             # Image HSV-Saturation augmentation
+hsv_v: 0.3             # Image HSV-Value augmentation
+degrees: 0.0           # Rotation disabled (aerial orientation is semantically significant)
+translate: 0.1         # Image translation (+/- fraction)
+scale: 0.3             # Image scale (+/- gain)
+shear: 0.0             # Image shear (+/- degrees)
+perspective: 0.0       # Image perspective (+/- fraction)
+flipud: 0.0            # Vertical flip disabled (aerial up/down orientation matters)
+fliplr: 0.5            # Horizontal flip — orientation-agnostic for most aerial datasets
+mosaic: 1.0            # Mosaic augmentation (disabled for last --no-augs N epochs)
+mixup: 0.0             # Mixup disabled (can destabilise on dense small-object datasets)
+copy_paste: 0.1        # Copy-paste increases instance density variety

@@ -1,0 +1,59 @@
+# VisDrone2019-DET Dataset Configuration for DA-YOLO
+#
+# Dataset: VisDrone2019-DET (drone-captured aerial imagery)
+# Source:  https://github.com/VisDrone/VisDrone-Dataset
+# Classes: 10 (excluding ignored/other classes 0 and 11 from the raw annotations)
+# Images:  6471 train / 548 val / 1610 test-challenge
+# Image size: 1920×1080 (original), train with --img-size 1280
+#
+# Download and conversion steps:
+#   1. Download from https://github.com/VisDrone/VisDrone-Dataset
+#      VisDrone2019-DET-train.zip, VisDrone2019-DET-val.zip, VisDrone2019-DET-test-dev.zip
+#   2. Extract to a common root, e.g. /data/VisDrone/
+#      /data/VisDrone/
+#        VisDrone2019-DET-train/  images/  annotations/
+#        VisDrone2019-DET-val/    images/  annotations/
+#        VisDrone2019-DET-test-dev/ images/ annotations/
+#   3. Run the converter:
+#      python utils/visdrone_converter.py \
+#          --root /data/VisDrone \
+#          --out  /data/VisDrone/yolo
+#   4. Update the 'path' field below to match --out
+#
+# Training:
+#   # Fine-tune mode (lr=1e-6, recommended if you have pretrained weights)
+#   python train_da_yolo.py --data data/visdrone.yaml --img-size 1280
+#
+#   # From-scratch (lr=1e-4)
+#   python train_da_yolo.py --data data/visdrone.yaml --img-size 1280 --mode scratch
+#
+# Re-cluster anchors for VisDrone (strongly recommended — objects are much smaller than COCO):
+#   python utils/ciou_kmeans.py \
+#       --label-dir /data/VisDrone/yolo/labels/train \
+#       --img-size 1280 \
+#       --n-clusters 12
+#   Then paste output into models/da_yolo.yaml anchors section.
+
+# Dataset root (set to the --out path from visdrone_converter.py)
+path: /home/ubuntu/project_DA-YOLO/DA-YOLO/VisDrone_dataset/yolo
+
+# Splits — relative to 'path'
+train: images/train
+val:   images/val
+test:  images/test-dev   # optional
+
+# Number of classes (10 categories, ignoring class 0=ignored and class 11=others)
+nc: 10
+
+# Class names — indices match converter output (VisDrone category_id - 1)
+names:
+  0: pedestrian
+  1: people
+  2: bicycle
+  3: car
+  4: van
+  5: truck
+  6: tricycle
+  7: awning-tricycle
+  8: bus
+  9: motor

@@ -1,7 +1,7 @@
 """
 tests/test_components.py
 ========================
-Component-level unit tests for all SwinYOLO custom modules.
+Component-level unit tests for all DA-YOLO custom modules.
 
 Run from repo root:
     python tests/test_components.py         # standalone — no pytest required
@@ -447,15 +447,15 @@ def _test_dc3swt_train_eval():
 
 def _test_dc3swt_model_parse():
     """
-    Full model parse from yolov5s_dc3swt.yaml — verifies DC3SWT integrates
-    cleanly with BiFPN, CoordAttMulti, and the 4-scale Detect head.
+    Full model parse from da_yolo.yaml — verifies DC3SWT integrates
+    cleanly with BiFPN (SE+DCNv2), CoordAttMulti, and the 4-scale Detect head.
     DC3SWT: deformable attention replaces W-MSA+SW-MSA, see arxiv:2010.04159
     """
     from models.yolo import Model
     yaml_path = os.path.join(
-        os.path.dirname(__file__), "..", "models", "yolov5s_dc3swt.yaml"
+        os.path.dirname(__file__), "..", "models", "da_yolo.yaml"
     )
-    assert os.path.isfile(yaml_path), f"DC3SWT YAML not found: {yaml_path}"
+    assert os.path.isfile(yaml_path), f"DA-YOLO YAML not found: {yaml_path}"
     model = Model(yaml_path, ch=3, nc=10)
     model.eval()
     with torch.no_grad():
@@ -527,7 +527,7 @@ def _test_model_bifpn_dcn_enabled():
 def main():
     print()
     print("=" * 65)
-    print("  SwinYOLO Component Tests")
+    print("  DA-YOLO Component Tests")
     print("=" * 65)
     print()
 

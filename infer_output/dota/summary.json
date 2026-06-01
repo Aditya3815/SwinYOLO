@@ -1,0 +1,143 @@
+{
+  "run_info": {
+    "weights": "/home/ubuntu/project_DA-YOLO/DA-YOLO/runs/da_yolo/dota_scratch2/weights/best.pth",
+    "source": "/data/DOTA/yolo/images/val",
+    "num_images": 20,
+    "total_detections": 437,
+    "imgsz": 1024,
+    "conf_thres": 0.25,
+    "nms_iou": 0.45,
+    "device": "cuda:0",
+    "total_time_s": 1.76,
+    "avg_ms_per_img": 87.8,
+    "fps": 11.4
+  },
+  "class_counts": {
+    "large-vehicle": 276,
+    "small-vehicle": 123,
+    "ship": 35,
+    "harbor": 3
+  },
+  "per_image": {
+    "P0003_resized.png": {
+      "total": 51,
+      "by_class": {
+        "small-vehicle": 11,
+        "large-vehicle": 40
+      }
+    },
+    "P0004_resized.png": {
+      "total": 116,
+      "by_class": {
+        "large-vehicle": 94,
+        "small-vehicle": 22
+      }
+    },
+    "P0007_0_0.png": {
+      "total": 31,
+      "by_class": {
+        "small-vehicle": 20,
+        "large-vehicle": 11
+      }
+    },
+    "P0007_0_1536.png": {
+      "total": 20,
+      "by_class": {
+        "ship": 6,
+        "large-vehicle": 13,
+        "small-vehicle": 1
+      }
+    },
+    "P0007_0_768.png": {
+      "total": 66,
+      "by_class": {
+        "large-vehicle": 54,
+        "ship": 11,
+        "small-vehicle": 1
+      }
+    },
+    "P0007_768_0.png": {
+      "total": 49,
+      "by_class": {
+        "large-vehicle": 30,
+        "small-vehicle": 19
+      }
+    },
+    "P0007_768_1536.png": {
+      "total": 16,
+      "by_class": {
+        "small-vehicle": 8,
+        "ship": 5,
+        "large-vehicle": 3
+      }
+    },
+    "P0007_768_768.png": {
+      "total": 51,
+      "by_class": {
+        "large-vehicle": 31,
+        "small-vehicle": 15,
+        "ship": 5
+      }
+    },
+    "P0019_0_0.png": {
+      "total": 5,
+      "by_class": {
+        "small-vehicle": 2,
+        "ship": 2,
+        "harbor": 1
+      }
+    },
+    "P0019_0_2304.png": {
+      "total": 7,
+      "by_class": {
+        "small-vehicle": 7
+      }
+    },
+    "P0019_0_3072.png": {
+      "total": 7,
+      "by_class": {
+        "small-vehicle": 7
+      }
+    },
+    "P0019_0_768.png": {
+      "total": 4,
+      "by_class": {
+        "ship": 3,
+        "harbor": 1
+      }
+    },
+    "P0019_1536_0.png": {
+      "total": 2,
+      "by_class": {
+        "small-vehicle": 2
+      }
+    },
+    "P0019_1536_2304.png": {
+      "total": 4,
+      "by_class": {
+        "ship": 2,
+        "small-vehicle": 1,
+        "harbor": 1
+      }
+    },
+    "P0019_1536_3072.png": {
+      "total": 2,
+      "by_class": {
+        "small-vehicle": 2
+      }
+    },
+    "P0019_2304_0.png": {
+      "total": 1,
+      "by_class": {
+        "small-vehicle": 1
+      }
+    },
+    "P0019_3072_0.png": {
+      "total": 5,
+      "by_class": {
+        "small-vehicle": 4,
+        "ship": 1
+      }
+    }
+  }
+}

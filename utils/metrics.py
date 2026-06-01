@@ -235,8 +235,12 @@ class ConfusionMatrix:
             print(" ".join(map(str, self.matrix[i])))
 
 
-def bbox_iou(box1, box2, xywh=True, GIoU=False, DIoU=False, CIoU=False, eps=1e-7):
-    """Calculates IoU, GIoU, DIoU, or CIoU between two boxes, supporting xywh/xyxy formats.
+def bbox_iou(box1, box2, xywh=True, GIoU=False, DIoU=False, CIoU=False, WIoU=False, eps=1e-7):
+    """Calculates IoU, GIoU, DIoU, CIoU, or WIoU between two boxes, supporting xywh/xyxy formats.
+
+    WIoU (Wise-IoU, AAAI 2023): geometric factor g = exp(ρ²/c²) down-weights easy
+    centre-aligned anchors and focuses gradient on geometrically harder samples.
+    Returns value r s.t. (1 - r) = WIoU loss, preserving the same call site as CIoU.
 
     Input shapes are box1(1,4) to box2(n,4).
     """
@@ -262,12 +266,21 @@ def bbox_iou(box1, box2, xywh=True, GIoU=False, DIoU=False, CIoU=False, eps=1e-7
 
     # IoU
     iou = inter / union
-    if CIoU or DIoU or GIoU:
+    if CIoU or DIoU or GIoU or WIoU:
         cw = b1_x2.maximum(b2_x2) - b1_x1.minimum(b2_x1)  # convex (smallest enclosing box) width
         ch = b1_y2.maximum(b2_y2) - b1_y1.minimum(b2_y1)  # convex height
-        if CIoU or DIoU:  # Distance or Complete IoU https://arxiv.org/abs/1911.08287v1
+        if CIoU or DIoU or WIoU:  # Distance or Complete IoU https://arxiv.org/abs/1911.08287v1
             c2 = cw**2 + ch**2 + eps  # convex diagonal squared
             rho2 = ((b2_x1 + b2_x2 - b1_x1 - b1_x2) ** 2 + (b2_y1 + b2_y2 - b1_y1 - b1_y2) ** 2) / 4  # center dist ** 2
+            if WIoU:
+                # WIoU v1 geometric factor (AAAI 2023, arxiv:2301.10051).
+                # g = exp(ρ²/c²) — grows when centres are far relative to the enclosing box,
+                # assigning larger loss to geometrically misaligned predictions while
+                # down-weighting easy near-centre anchors.
+                # Return 1 - g*(1-iou) so that (1 - return) = WIoU loss, keeping the
+                # same `lbox += (1 - iou).mean()` call site in loss.py unchanged.
+                g = torch.exp(rho2 / c2)
+                return 1 - g * (1 - iou)  # WIoU v1
             if CIoU:  # https://github.com/Zzh-tju/DIoU-SSD-pytorch/blob/master/utils/box/box_utils.py#L47
                 v = (4 / math.pi**2) * (torch.atan(w2 / h2) - torch.atan(w1 / h1)).pow(2)
                 with torch.no_grad():

@@ -201,7 +201,7 @@ def train(hyp, opt, device, callbacks):
     # Config
     plots = not evolve and not opt.noplots  # create plots
     cuda = device.type != "cpu"
-    init_seeds(opt.seed + 1 + RANK, deterministic=True)
+    init_seeds(opt.seed + 1 + RANK, deterministic=False)
     with torch_distributed_zero_first(LOCAL_RANK):
         data_dict = data_dict or check_dataset(data)  # check if None
     train_path, val_path = data_dict["train"], data_dict["val"]
@@ -477,7 +477,7 @@ def train(hyp, opt, device, callbacks):
             # Optimize - https://pytorch.org/docs/master/notes/amp_examples.html
             if ni - last_opt_step >= accumulate:
                 scaler.unscale_(optimizer)  # unscale gradients
-                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)  # clip gradients (Swin standard)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)  # clip gradients (Swin standard)
                 scaler.step(optimizer)  # optimizer.step
                 scaler.update()
                 optimizer.zero_grad()
@@ -709,7 +709,7 @@ def parse_opt(known=False):
     parser.add_argument("--ndjson-console", action="store_true", help="Log ndjson to console")
     parser.add_argument("--ndjson-file", action="store_true", help="Log ndjson to file")
 
-    # SwinYOLO V4 extensions
+    # DA-YOLO extensions
     parser.add_argument(
         "--no-augs", type=int, default=0,
         help="Disable mosaic+copy_paste for the last N epochs (YOLOv8 close-mosaic trick). "

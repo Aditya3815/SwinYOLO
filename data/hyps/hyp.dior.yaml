@@ -1,0 +1,48 @@
+# Hyperparameters for DA-YOLO on DIOR-R (HBB)
+# Tuned for fixed 800×800 remote sensing images with well-distributed object sizes.
+#
+# Key differences from hyp.visdrone.yaml:
+#   lr0 = 1e-4      : From-scratch training
+#   obj = 1.0       : Objects are larger and clearer than VisDrone — standard weight
+#   fl_gamma = 0.0  : Class imbalance in DIOR-R is mild; disable focal loss
+#   copy_paste = 0.3: Moderate — DIOR-R is reasonably balanced
+#   scale = 0.3     : Less scale jitter — all images are 800×800, objects are stable
+#   mosaic = 1.0    : Still beneficial for multi-class diversity
+#   loss_type: wiou : WIoU v1 geometric loss
+#   label_smoothing = 0.1 : DIOR-R labels are cleaner than VisDrone
+
+lr0: 0.0001
+lrf: 0.005
+momentum: 0.937
+weight_decay: 0.05
+warmup_epochs: 3.0
+warmup_momentum: 0.8
+warmup_bias_lr: 0.0001
+
+box: 0.05
+cls: 0.5
+cls_pw: 1.0
+obj: 1.0
+obj_pw: 1.0
+
+loss_type: wiou
+
+iou_t: 0.20
+anchor_t: 4.0
+fl_gamma: 0.0
+
+label_smoothing: 0.1
+
+hsv_h: 0.015
+hsv_s: 0.7
+hsv_v: 0.4
+degrees: 0.0           # Remote sensing — fixed orientation
+translate: 0.1
+scale: 0.3             # Less jitter — DIOR objects are well-scaled at 800px
+shear: 0.0
+perspective: 0.0
+flipud: 0.0
+fliplr: 0.5
+mosaic: 1.0
+mixup: 0.0
+copy_paste: 0.3

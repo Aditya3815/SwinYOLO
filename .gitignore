@@ -1,4 +1,4 @@
-# Repo-specific GitIgnore ----------------------------------------------------------------------------------------------
+ï»¿# Repo-specific GitIgnore ----------------------------------------------------------------------------------------------
 *.jpg
 *.jpeg
 *.png
@@ -257,13 +257,37 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-# SwinYOLO — dataset-specific configs (create your own from data/swinyolo_example.yaml)
+# DA-YOLO --- dataset-specific private configs
 data/sld.yaml
 data/*_private.yaml
 data/*_local.yaml
+data/daswinyolo_sld.yaml
+
 # Checkpoint formats
 *.pth
-# Training artifacts
+
+# Training artifacts (large -- exclude from repo)
 runs/
+
+# Inference outputs -- large images; included only for 3-dataset results
+# infer_output/ is tracked (VisDrone, DIOR-R, DOTA visualisations for paper)
+
 # Test cache
 tests/__pycache__/
+
+# Eval results -- allow JSON/PNG/CSV/TEX benchmark metrics (paper reference)
+!eval_results/
+!eval_results/**/*.json
+!eval_results/**/*.png
+!eval_results/**/*.txt
+!eval_results/**/*.csv
+!eval_results/**/*.tex
+
+# Inference output -- allow aggregate summary files only (not per-image visualisations)
+infer_output/**/visualisations/
+infer_output/**/detections_*.json
+infer_output/**/mosaic.jpg
+!infer_output/
+!infer_output/**/summary.json
+!infer_output/**/summary.csv
+!infer_output/**/class_distribution.png

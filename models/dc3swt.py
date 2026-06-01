@@ -1,7 +1,7 @@
 """
 models/dc3swt.py — DC3SWT: Deformable C3 Swin Transformer Block
 ================================================================
-Core attention module for DASwin-YOLO (Deformable Attention Swin YOLO).
+Core attention module for DA-YOLO (Deformable Attention YOLO).
 DC3SWT: deformable attention replaces W-MSA+SW-MSA, see arxiv:2010.04159
 
 Motivation

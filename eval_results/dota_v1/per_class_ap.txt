@@ -1,0 +1,20 @@
+Class                              AP@0.5 (%)   AP@.5:.95 (%)
+--------------------------------------------------------------
+plane                                   77.89           50.78
+ship                                    82.93           53.55
+storage-tank                            61.29           33.41
+baseball-diamond                         2.48            1.02
+tennis-court                            79.95           63.10
+basketball-court                         0.65            0.35
+ground-track-field                       0.52            0.20
+harbor                                  50.16           20.89
+bridge                                  29.35           12.11
+large-vehicle                           58.57           35.32
+small-vehicle                           55.70           26.25
+helicopter                               6.94            4.00
+roundabout                               1.07            0.59
+soccer-ball-field                        0.23            0.10
+swimming-pool                           25.61           10.55
+container-crane                          0.00            0.00
+--------------------------------------------------------------
+mAP                                     33.33           19.51

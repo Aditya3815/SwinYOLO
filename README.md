@@ -89,6 +89,34 @@ Inspired by *"Swin-Transformer-Based YOLOv5 for Small-Object Detection in Remote
 
 ---
 
+### DOTA 1.5 Validation Set (3360 images, 16 classes, 1024×1024)
+
+| Model | Params | GFLOPs | mAP@0.5 | mAP@0.5:0.95 | Precision | Recall | FPS |
+|---|---|---|---|---|---|---|---|
+| **DA-YOLO (epoch 95)** | **5.55M** | **22.93** | **33.33%** | **19.51%** | **0.780** | **0.317** | **57.0** |
+
+> 183 epochs from scratch · best at epoch 95 · 1024px · batch 4 · `hyp.dota.yaml` · `models/da_yolo_dota.yaml`  
+> Eval: `eval_results/dota_v1/` — GFLOPs at 1024px. HBB evaluation (axis-aligned boxes; OBB is future work).
+
+### DOTA 1.5 Per-Class AP@0.5 (16 classes)
+
+| Class | AP@0.5 | AP@0.5:0.95 | | Class | AP@0.5 | AP@0.5:0.95 |
+|---|---|---|---|---|---|---|
+| **ship** | **82.93%** | 53.55% | | bridge | 29.35% | 12.11% |
+| **tennis-court** | **79.95%** | 63.10% | | swimming-pool | 25.61% | 10.55% |
+| **plane** | **77.89%** | 50.78% | | helicopter | 6.94% | 4.00% |
+| storage-tank | 61.29% | 33.41% | | baseball-diamond | 2.48% | 1.02% |
+| large-vehicle | 58.57% | 35.32% | | roundabout | 1.07% | 0.59% |
+| small-vehicle | 55.70% | 26.25% | | basketball-court | 0.65% | 0.35% |
+| harbor | 50.16% | 20.89% | | ground-track-field | 0.52% | 0.20% |
+| — | — | — | | soccer-ball-field | 0.23% | 0.10% |
+| — | — | — | | **container-crane** | **0.00%** | 0.00% |
+
+> Strong: small dense objects with distinct shapes (ship, plane, court). Weak: large irregular fields, rare classes (container-crane had 0 training instances in early epochs).  
+> High precision (78%) + low recall (31.7%) reflects conservative thresholding on a heavily class-imbalanced dataset (small-vehicle ≫ all others).
+
+---
+
 ## Novel Contributions
 
 ### 1. DC3SWT — Deformable C3 Swin Transformer Block
@@ -252,7 +280,11 @@ $$\mathbf{O} = \text{Conv}\!\left(\sum_{i=1}^{N} \frac{w_i}{\varepsilon + \sum_{
 
 where $\hat{w}_i$ are learnable scalars initialized to 1 and $\varepsilon = 10^{-4}$ ensures numerical stability. The three-input P3_out fusion (the only node receiving backbone skip + top-down + bottom-up paths simultaneously) is:
 
+<<<<<<< HEAD
 $$P_3^{\text{out}} = \text{DConv}\!\left(\frac{w_1 P_3 + w_2 P_3^{\text{td}} + w_3\,\text{Up}(P_2^{\text{out}})}{w_1 + w_2 + w_3 + \varepsilon}\right)$$
+=======
+$$P_3^{\text{out}} = \text{DConv}\!\left(\frac{w_1 P_3 + w_2 P_3^{\text{td}} + w_3\,\text{Down}(P_2^{\text{out}})}{w_1 + w_2 + w_3 + \varepsilon}\right)$$
+>>>>>>> 9eb81d71 (feat: DA-YOLO v2 -- full release with DIOR-R, DOTA 1.5, and VisDrone benchmarks)
 
 where $\text{DConv}$ denotes Deformable Conv v2 (DCNv2) — placed exclusively at P3 because this node has the highest spatial misalignment from three distinct receptive-field paths.
 
@@ -369,7 +401,11 @@ flowchart TB
     subgraph BFN["SE-BiFPN Cross-Scale Fusion"]
         direction TB
         BF1["BiFPN Node — p4_td\n⚡ SEBlock"]
+<<<<<<< HEAD
         BF2["BiFPN Node — p3_td\n⚡ SEBlock + DCNv2"]
+=======
+        BF2["BiFPN Node — p3_td\n⚡ SEBlock"]
+>>>>>>> 9eb81d71 (feat: DA-YOLO v2 -- full release with DIOR-R, DOTA 1.5, and VisDrone benchmarks)
         BF3["BiFPN Node — p2_out\n⚡ SEBlock"]
         BF4["BiFPN Node — p3_out\n⚡ SEBlock + DCNv2"]
         BF5["BiFPN Node — p4_out\n⚡ SEBlock"]
@@ -726,6 +762,23 @@ flowchart LR
 ## Evaluation
 
 ```bash
+<<<<<<< HEAD
+=======
+# DIOR-R — full evaluation (5863 images, 20 classes, paper-ready outputs)
+venv/bin/python3 evaluate_dior.py
+# Outputs: eval_results/dior_v1/  (metrics_table.txt, .tex, per-class AP, curves)
+
+# DOTA 1.5 — full evaluation (3360 images, 16 classes, paper-ready outputs)
+venv/bin/python3 evaluate_dota.py
+# Outputs: eval_results/dota_v1/  (metrics_table.txt, .tex, per-class AP, curves)
+
+# VisDrone — SAHI evaluation (recommended for best results)
+venv/bin/python3 evaluate_visdrone_sahi.py \
+    --weights runs/da_yolo/visdrone_v22/weights/best.pth \
+    --data    data/visdrone.yaml \
+    --tile-size 1280 --overlap 0.25
+
+>>>>>>> 9eb81d71 (feat: DA-YOLO v2 -- full release with DIOR-R, DOTA 1.5, and VisDrone benchmarks)
 # Standard validation (no SAHI)
 venv/bin/python3 val.py \
     --data    data/visdrone.yaml \
@@ -745,6 +798,47 @@ venv/bin/python3 val.py \
 
 ## Inference
 
+<<<<<<< HEAD
+=======
+### DIOR-R (dedicated pipeline)
+
+```bash
+# First 20 val images — annotated images, JSON, CSV, mosaic
+venv/bin/python3 infer_dior.py
+
+# All val images:
+venv/bin/python3 infer_dior.py --max-images -1
+
+# Custom:
+venv/bin/python3 infer_dior.py \
+    --weights runs/da_yolo/dior_scratch3/weights/best.pth \
+    --source  /data/DIOR-R/yolo/images/val \
+    --conf 0.30 --iou 0.45 --max-images 50
+```
+
+Outputs to `infer_output/dior/`: annotated images, `mosaic.jpg`, `class_distribution.png`, per-image JSON, `summary.json`, `summary.csv`.
+
+### DOTA 1.5 (dedicated pipeline)
+
+```bash
+# First 20 val tiles — annotated images, JSON, CSV, mosaic
+venv/bin/python3 infer_dota.py
+
+# All val tiles:
+venv/bin/python3 infer_dota.py --max-images -1
+
+# Custom:
+venv/bin/python3 infer_dota.py \
+    --weights runs/da_yolo/dota_scratch2/weights/best.pth \
+    --source  /data/DOTA/yolo/images/val \
+    --conf 0.30 --iou 0.45 --max-images 50
+```
+
+Outputs to `infer_output/dota/`: same structure as DIOR-R pipeline above.
+
+### VisDrone / Generic
+
+>>>>>>> 9eb81d71 (feat: DA-YOLO v2 -- full release with DIOR-R, DOTA 1.5, and VisDrone benchmarks)
 ```bash
 # Single image
 venv/bin/python3 detect.py \
@@ -835,7 +929,11 @@ venv/bin/python3 train_da_yolo.py --data data/dota.yaml --cfg models/da_yolo_dot
 | `models/da_yolo_dota.yaml` | Architecture config — DOTA 1.5 anchors (1024px) |
 | `models/dc3swt.py` | `DC3SWT` + `MSDABlock` — deformable attention (pure PyTorch) |
 | `models/swin_block.py` | `C3SWT` — fixed-window Swin (ablation baseline) |
+<<<<<<< HEAD
 | `models/bifpn.py` | `BiFPNLayer` — BiFPN with DCNv2 @ P3 and SEBlock at all 6 nodes |
+=======
+| `models/bifpn.py` | `BiFPNLayer` — BiFPN with DCNv2 @ P3_out node and SEBlock at all 6 nodes |
+>>>>>>> 9eb81d71 (feat: DA-YOLO v2 -- full release with DIOR-R, DOTA 1.5, and VisDrone benchmarks)
 | `models/coord_attention.py` | `CoordAtt` + `CoordAttMulti` — Coordinate Attention |
 | `utils/metrics.py` | `bbox_iou()` with WIoU v1 flag |
 | `utils/loss.py` | `ComputeLoss` — activates WIoU via `loss_type: wiou` in hyp yaml |
@@ -847,6 +945,13 @@ venv/bin/python3 train_da_yolo.py --data data/dota.yaml --cfg models/da_yolo_dot
 | `train_da_yolo.py` | **Primary training launcher** — best-practice defaults, all datasets |
 | `train.py` | Core YOLOv5 training loop (used internally) |
 | `evaluate_visdrone_sahi.py` | SAHI evaluation with cross-patch NMS and per-class AP reporting |
+<<<<<<< HEAD
+=======
+| `evaluate_dior.py` | Comprehensive DIOR-R evaluation — mAP, per-class AP, curves, LaTeX table |
+| `evaluate_dota.py` | Comprehensive DOTA 1.5 evaluation — mAP, per-class AP, curves, LaTeX table |
+| `infer_dior.py` | DIOR-R inference pipeline — annotated images, JSON, CSV, mosaic |
+| `infer_dota.py` | DOTA 1.5 inference pipeline — annotated images, JSON, CSV, mosaic |
+>>>>>>> 9eb81d71 (feat: DA-YOLO v2 -- full release with DIOR-R, DOTA 1.5, and VisDrone benchmarks)
 | `val.py` | Standard evaluation script |
 | `detect.py` | Inference script |
 | `export.py` | Export to ONNX / TorchScript |
@@ -960,7 +1065,12 @@ venv/bin/python3 train_da_yolo.py \
 - [x] DOTA 1.5 OBB→HBB converter (`utils/dota_hbb_converter.py`, `data/dota.yaml`, `models/da_yolo_dota.yaml`)
 - [x] Dataset-specific hyp yamls for VisDrone, DIOR-R, DOTA 1.5
 - [x] DIOR-R benchmark results — **60.00% mAP@0.5** (`runs/da_yolo/dior_scratch3`, epoch 144)
+<<<<<<< HEAD
 - [ ] DOTA 1.5 benchmark results (training in progress — `runs/da_yolo/dota_scratch`)
+=======
+- [x] DOTA 1.5 benchmark results — **33.33% mAP@0.5** (`runs/da_yolo/dota_scratch2`, epoch 95)
+- [x] Inference pipelines: `infer_dior.py` and `infer_dota.py` with JSON/CSV/mosaic output
+>>>>>>> 9eb81d71 (feat: DA-YOLO v2 -- full release with DIOR-R, DOTA 1.5, and VisDrone benchmarks)
 - [ ] DIOR-R OBB head extension (angle regression branch)
 - [ ] fp16 / TensorRT export validation on VisDrone
 - [ ] SAHI evaluation script for DIOR-R and DOTA
