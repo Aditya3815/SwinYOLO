@@ -370,86 +370,77 @@ Objectness target $t_{\text{obj}} = \text{IoU}(\text{pred}, \text{gt})$ (soft la
 
 ```mermaid
 flowchart TB
-    IMG["🖼️ Input Image\n(any resolution)"]
+    IMG(["🖼️ Input Image (any resolution)"])
 
-    subgraph BB["Backbone — YOLOv5s-CSP + DC3SWT"]
-        direction TB
-        C0["Conv 6×6/2  →  P1/2"]
-        C1["Conv 3×3/2  →  P2/4\n128ch"]
-        C2["C3 × 3"]
-        C3["Conv 3×3/2  →  P3/8\n256ch"]
-        C4["C3 × 6"]
-        C5["Conv 3×3/2  →  P4/16\n512ch"]
-        C6["C3 × 9"]
-        C7["Conv 3×3/2  →  P5/32\n1024ch"]
-        C8["DC3SWT × 3\n🔵 MSDA @ P5"]
-        C9["SPPF"]
-        C0-->C1-->C2-->C3-->C4-->C5-->C6-->C7-->C8-->C9
-    end
-
-    subgraph TD["PANet Top-Down — DC3SWT at every level"]
+    subgraph BB["① Backbone — YOLOv5s-CSP + DC3SWT"]
         direction LR
-        TD1["Conv + Upsample\nP5 → P4 scale"]
-        TD2["DC3SWT × 3\n🔵 MSDA @ P4"]
-        TD3["Conv + Upsample\nP4 → P3 scale"]
-        TD4["DC3SWT × 3\n🔵 MSDA @ P3"]
-        TD5["Conv + Upsample\nP3 → P2 scale"]
-        TD6["DC3SWT × 3\n🔵 MSDA @ P2"]
-        TD1-->TD2-->TD3-->TD4-->TD5-->TD6
+        b1["Conv 6×6\nP1/2"]
+        b2["C3 × 3\nP2/4  128ch"]
+        b3["C3 × 6\nP3/8  256ch"]
+        b4["C3 × 9\nP4/16  512ch"]
+        b5["DC3SWT × 3\n🔵 MSDA @ P5"]
+        b6["SPPF\nP5/32  1024ch"]
+        b1 --> b2 --> b3 --> b4 --> b5 --> b6
     end
 
-    subgraph BFN["SE-BiFPN Cross-Scale Fusion"]
-        direction TB
-        BF1["BiFPN Node — p4_td\n⚡ SEBlock"]
-<<<<<<< HEAD
-        BF2["BiFPN Node — p3_td\n⚡ SEBlock + DCNv2"]
-=======
-        BF2["BiFPN Node — p3_td\n⚡ SEBlock"]
->>>>>>> 9eb81d71 (feat: DA-YOLO v2 -- full release with DIOR-R, DOTA 1.5, and VisDrone benchmarks)
-        BF3["BiFPN Node — p2_out\n⚡ SEBlock"]
-        BF4["BiFPN Node — p3_out\n⚡ SEBlock + DCNv2"]
-        BF5["BiFPN Node — p4_out\n⚡ SEBlock"]
-        BF6["BiFPN Node — p5_out\n⚡ SEBlock"]
-    end
-
-    subgraph CA["CoordAttMulti — per-scale position encoding"]
+    subgraph TD["② PANet Top-Down — DC3SWT fuses backbone skips at every scale"]
         direction LR
-        CA2["CoordAtt P2"]
-        CA3["CoordAtt P3"]
-        CA4["CoordAtt P4"]
-        CA5["CoordAtt P5"]
+        td4["Cat P4-skip + ↑P5\nDC3SWT × 3  🔵 MSDA @ P4"]
+        td3["Cat P3-skip + ↑P4\nDC3SWT × 3  🔵 MSDA @ P3"]
+        td2["Cat P2-skip + ↑P3\nDC3SWT × 3  🔵 MSDA @ P2"]
+        td4 --> td3 --> td2
     end
 
-    subgraph DH["4-Scale Detection Heads"]
+    subgraph BFN["③ SE-BiFPN — bidirectional weighted fusion  (4 inputs → 4 outputs)"]
         direction LR
-        H2["Head P2\nstride 4\ntiny 2–16px"]
-        H3["Head P3\nstride 8\nsmall 16–48px"]
-        H4["Head P4\nstride 16\nmedium 48–128px"]
-        H5["Head P5\nstride 32\nlarge 128+px"]
+        subgraph TOPDOWN["↓ Top-Down"]
+            direction LR
+            bf1["p4_td\n⚡ SE"]
+            bf2["p3_td\n⚡ SE"]
+            bf3["p2_out\n⚡ SE"]
+            bf1 --> bf2 --> bf3
+        end
+        subgraph BOTTOMUP["↑ Bottom-Up"]
+            direction LR
+            bf4["p3_out\n⚡ SE + DCNv2"]
+            bf5["p4_out\n⚡ SE"]
+            bf6["p5_out\n⚡ SE"]
+            bf4 --> bf5 --> bf6
+        end
+        bf3 --> bf4
     end
 
-    OUT["📦 Detections\n(class, bbox, conf)"]
+    subgraph HEAD["④ CoordAttMulti  +  4-Scale Detection Head"]
+        direction LR
+        ca2["CoordAtt\nP2"] --> h2["P2 Head\nstride 4\n2–16 px"]
+        ca3["CoordAtt\nP3"] --> h3["P3 Head\nstride 8\n16–48 px"]
+        ca4["CoordAtt\nP4"] --> h4["P4 Head\nstride 16\n48–128 px"]
+        ca5["CoordAtt\nP5"] --> h5["P5 Head\nstride 32\n128+ px"]
+    end
 
-    IMG --> BB
-    BB --> TD
-    C2 -->|"P2 skip"| BFN
-    C4 -->|"P3 skip"| BFN
-    C6 -->|"P4 skip"| BFN
-    C9 -->|"P5 SPPF"| BFN
-    TD --> BFN
-    BFN --> CA
-    CA2 --> H2
-    CA3 --> H3
-    CA4 --> H4
-    CA5 --> H5
-    H2 & H3 & H4 & H5 --> OUT
+    OUT(["📦 Detections  (class · bbox · conf)"])
+
+    IMG --> b1
+    b4  -->|"P4 skip"| td4
+    b3  -->|"P3 skip"| td3
+    b2  -->|"P2 skip"| td2
+    b6  --> td4
+    td4 --> bf1
+    td3 --> bf2
+    td2 --> bf3
+    b6  -->|"P5 / SPPF"| bf6
+    bf3 --> ca2
+    bf4 --> ca3
+    bf5 --> ca4
+    bf6 --> ca5
+    h2 & h3 & h4 & h5 --> OUT
 ```
 
 **Legend:**
-- 🔵 **DC3SWT**: Multi-Scale Deformable Attention (MSDA) — replaces fixed Swin windows
-- ⚡ **SEBlock**: Squeeze-Excitation channel recalibration at each BiFPN fusion node
-- **DCNv2**: Deformable Conv at P3 BiFPN node (highest spatial misalignment junction)
-- **CoordAtt**: H/W-directional pooling — preserves spatial position before detection
+- 🔵 **DC3SWT** — Multi-Scale Deformable Attention (MSDA): replaces fixed Swin windows; backbone P5 and all PANet levels
+- ⚡ **SEBlock** — Squeeze-Excitation channel recalibration applied after every BiFPN fusion convolution (all 6 nodes)
+- **DCNv2** — Deformable Conv v2 at P3_out only: the only node merging 3 distinct spatial paths simultaneously
+- **CoordAtt** — H/W directional pooling: encodes 2D position before each detection head
 
 ---
 
